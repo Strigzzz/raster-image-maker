@@ -9,7 +9,6 @@ namespace WinFormsApp1
         public Form1()
         {
             InitializeComponent();
-
             this.Width = 900;
             this.Height = 700;
             bm = new Bitmap(pic.Width, pic.Height);
@@ -29,7 +28,7 @@ namespace WinFormsApp1
         bool filled = false;
         ColorDialog cd = new ColorDialog();
         Color new_color;
-        Stack<Bitmap> undoStack = new Stack<Bitmap>();
+        List<Bitmap> undoList = new List<Bitmap>();
         private void pic_MouseDown(object sender, MouseEventArgs e)
         {
             paint = true;
@@ -38,6 +37,14 @@ namespace WinFormsApp1
             aX = e.X; 
             aY = e.Y;
 
+            if(index == 1)
+            {
+                ChangeMade();
+            }
+            if (index == 2)
+            {
+                ChangeMade();
+            }
             if(index == 5) //the fill tool Can't fill with black, kept crashing when filled black on top of black
             {
                 Point pt = new Point(aX, aY);
@@ -81,31 +88,24 @@ namespace WinFormsApp1
             bX = x - aX;
             bY = y - aY;
 
-            if(index == 1)
-            {
-                ChangeMade();
-            }
-            if (index == 2)
-            {
-                ChangeMade();
-            }
+
             if (index == 3)//rectangle tool
             {
+                ChangeMade();
                 if (filled == true)
                 {
                     g.FillEllipse(b, aX, aY, bX, bY);
                 }
                 g.DrawEllipse(p, aX, aY, bX, bY);
-                ChangeMade();
             }
             if (index == 4)//elipse tool
             {
+                ChangeMade();
                 if (filled == true)
                 {
                     g.FillRectangle(b, aX, aY, bX, bY);
                 }
                 g.DrawRectangle(p, aX, aY, bX, bY);
-                ChangeMade();
             }
         }
         private void pencil_btn_Click(object sender, EventArgs e)
@@ -129,7 +129,8 @@ namespace WinFormsApp1
             index = 5;
         }
         private void test_btn_Click(object sender, EventArgs e)
-        {           
+        { 
+            ChangeMade();
             for(int z = 0;z < 5; z++)
             {
                 int i = pic.Width;
@@ -148,7 +149,7 @@ namespace WinFormsApp1
                     g.DrawRectangle(p, aX, aY, bX, bY);
                 }
             }
-            ChangeMade();
+
         }
         private void checkBox1_CheckedChanged(object sender, EventArgs e)//toggles filled shapes
         {
@@ -178,20 +179,26 @@ namespace WinFormsApp1
                 clear_btn_Click(sender, e);
             }
         }
-        private void ChangeMade()
+        private void ChangeMade()//limit of 5 undo's since this method is memory intensive
         {
             
-            undoStack.Push(bm);
+            undoList.Add(bm);
+            if(undoList.Count > 5) 
+            {
+                undoList.RemoveAt(undoList.Count - 6);
+            }
         }
         private void undo_btn_Click(object sender, EventArgs e)   //does not work yet
         {
-            if(undoStack.Count > 0)
+            if(undoList.Count > 0)
             {
-                bm = undoStack.Pop();
+                bm = undoList[undoList.Count -1];
+                undoList.RemoveAt(undoList.Count - 1);
+                g.DrawImage(bm, 0, 0);
                 pic.Image = bm;
+
             }
         }
-
         private void clear_btn_Click(object sender, EventArgs e)
         {
             g.Clear(Color.White);
@@ -278,11 +285,5 @@ namespace WinFormsApp1
                 btm.Save(sfd.FileName, ImageFormat.Jpeg);
             }
         }
-
-
-
-
-
-
     }
 }
