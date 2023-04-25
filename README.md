@@ -3,12 +3,18 @@ A simple Ratser image editor with SVG operations
 I have implemented the following tools
 
 Shape tools
+
 //rectangle
+
 //Elipse
 
+
 Freeform tools
+
 //Pencil
+
 //Eraser
+
 
 Utility tools
 //Fill tool
